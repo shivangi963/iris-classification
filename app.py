@@ -30,8 +30,7 @@ def load_model(path: str):
         try:
             return joblib.load(path), None
         except Exception as e:
-            pass  # fall through to retrain
-    # Train fresh if no file found
+            pass  
     iris = load_iris()
     model = RandomForestClassifier(n_estimators=100, random_state=42)
     model.fit(iris.data, iris.target)
@@ -65,7 +64,7 @@ elif predict_clicked:
             st.dataframe(
                 {"class": classes, "probability": [float(p) for p in proba]}
             )
-            proba_text = " (see table below)"
+            proba_text = " (see table above)"
         name_map = {0: "Setosa 🌱", 1: "Versicolor 🌸", 2: "Virginica 🌺"}
         st.success(f"**Prediction:** {name_map.get(int(pred), str(pred))}{proba_text}")
     except Exception as e:
