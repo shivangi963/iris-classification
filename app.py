@@ -1,7 +1,9 @@
-# app.py
 import numpy as np
 import streamlit as st
 import joblib
+import os
+from sklearn.datasets import load_iris
+from sklearn.ensemble import RandomForestClassifier
 
 st.set_page_config(page_title="Iris Flower Classifier", page_icon="🌸")
 
@@ -24,13 +26,16 @@ DEFAULT_RANGES = {
 
 @st.cache_resource
 def load_model(path: str):
-    try:
-        model = joblib.load(path)
-        return model, None
-    except FileNotFoundError:
-        return None, "❌ Model file 'iris_model.pkl' not found. Run your notebook to save it in the same folder as app.py."
-    except Exception as e:
-        return None, f"❌ Could not load model: {e}\nTip: Retrain & save the model in the same environment you're running Streamlit."
+    if os.path.exists(path):
+        try:
+            return joblib.load(path), None
+        except Exception as e:
+            pass  # fall through to retrain
+    # Train fresh if no file found
+    iris = load_iris()
+    model = RandomForestClassifier(n_estimators=100, random_state=42)
+    model.fit(iris.data, iris.target)
+    return model, None
 
 model, load_err = load_model("iris_model.pkl")
 
